@@ -1,1 +1,0 @@
-# seoyoung-calc
