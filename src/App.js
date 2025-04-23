@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
@@ -9,17 +8,12 @@ export default function App() {
   const [vatInput, setVatInput] = useState("");
   const [vatOutput, setVatOutput] = useState("");
   const [supplyAmount, setSupplyAmount] = useState("");
-
-  const suppliers = Array.from({ length: supplierCount }, (_, i) => String.fromCharCode(65 + i));
   const inputRefs = useRef({});
 
-  const parseNumber = (value) => {
-    return parseInt((value ?? '').toString().replace(/,/g, "")) || 0;
-  };
+  const suppliers = Array.from({ length: supplierCount }, (_, i) => String.fromCharCode(65 + i));
 
-  const formatNumber = (value) => {
-    return parseNumber(value).toLocaleString();
-  };
+  const parseNumber = (value) => parseInt((value ?? "").toString().replace(/,/g, "")) || 0;
+  const formatNumber = (value) => parseNumber(value).toLocaleString();
 
   useEffect(() => {
     const base = parseNumber(manualTotal) + 1000000;
@@ -28,6 +22,7 @@ export default function App() {
     const remaining = base - manualSum;
     const autoKeys = suppliers.filter(k => !manualKeys.includes(k));
     const result = {};
+
     autoKeys.forEach((k, i) => {
       if (i === autoKeys.length - 1) {
         result[k] = remaining - Math.floor(remaining / autoKeys.length) * i;
@@ -35,9 +30,11 @@ export default function App() {
         result[k] = Math.floor(remaining / autoKeys.length);
       }
     });
+
     manualKeys.forEach((k) => {
       result[k] = parseNumber(manualInputs[k]);
     });
+
     setCalculated(result);
   }, [manualTotal, manualInputs, supplierCount]);
 
@@ -51,9 +48,7 @@ export default function App() {
 
   const resetManualInputs = () => {
     const resetInputs = {};
-    suppliers.forEach((key) => {
-      resetInputs[key] = "";
-    });
+    suppliers.forEach(key => (resetInputs[key] = ""));
     setManualInputs(resetInputs);
     setManualTotal("");
   };
@@ -105,67 +100,67 @@ export default function App() {
                 <input
                   type="text"
                   value={formatNumber(manualInputs[key] || "")}
-                  ref={el => (inputRefs.current[key] = el)}
+                  ref={(el) => (inputRefs.current[key] = el)}
                   onChange={(e) => {
-                    setManualInputs({
-                      ...manualInputs,
-                      [key]: e.target.value.replace(/[^0-9,]/g, "")
-                    });
+                    수동 입력 설정({
+ ...수동 입력,
+ [키]: e.target.value.replace(/[^0-9,]/g, "")
+ });
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      const nextKey = suppliers[index + 1];
-                      if (nextKey && inputRefs.current[nextKey]) {
-                        inputRefs.current[nextKey].focus();
+ onKeyDown={(e) => {
+ 만약 (예: 키 === "입력") {
+ e.preventDefault();
+ const nextKey = 공급업체 [지수 + 1];
+ 만약 (nextKey & inputRefs.current[nextKey]) {
+ inputRefs.current[다음 키].포커스 ();
                       }
                     }
                   }}
-                  className="w-full border p-1 rounded"
-                />
-              </td>
-              <td className="border p-2">{formatNumber(calculated[key])} 원</td>
-            </tr>
+ className="w-완전 경계 p-1 반올림"
+ />
+ </td>
+ <td className="경계 p-2">{formatNumber(계산된 [키])} 원</td>
+ </tr>
           ))}
-        </tbody>
-      </table>
+ </tbody>
+ </표>
 
-      <div className="mb-6">
-        <button onClick={resetManualInputs} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">수기입력 초기화</button>
-      </div>
+ <div className="mb-6">
+ <클릭={수동 입력 재설정} className="bg-red-500 호버링:bg-red-600 텍스트-흰색 글꼴-볼드 py-2 px-4 둥근">수기입력 초기화</버튼>
+ </div>
 
-      <div className="mb-4 border-t pt-4">
-        <h2 className="text-xl font-bold mb-2">부가세 계산기</h2>
-        <label className="block mb-1 font-semibold">부가세 포함 금액 입력</label>
-        <input
-          type="text"
-          value={formatNumber(vatInput)}
-          onChange={(e) => setVatInput(e.target.value.replace(/[^0-9,]/g, ""))}
-          className="w-full border p-2 rounded mb-2"
-        />
-        <label className="block mb-1 font-semibold">공급가액</label>
-        <input
-          type="text"
-          value={supplyAmount}
-          readOnly
-          className="w-full border p-2 rounded mb-2 bg-gray-100"
-        />
-        <label className="block mb-1 font-semibold">부가세</label>
-        <input
-          type="text"
-          value={vatOutput}
-          readOnly
-          className="w-full border p-2 rounded mb-2 bg-gray-100"
-        />
-        <button
-          onClick={() => {
-            setVatInput("");
-            setVatOutput("");
-            setSupplyAmount("");
+ <div className="mb-4 border-t pt-4">
+ <h2 className="text-xl font-bold mb-2">부가세 계산기</h2>
+ <label className="block mb-1 폰트-세미볼트">부가세 포함 금액 입력</label>
+ <입력
+ type="text"
+ value={formatNumber(vatInput)}
+ onChange={(e) => setVatInput(e.target.value.replace(/[^0-9,]/g, "")}
+ className="w-전체 테두리 p-2 둥근 mb-2"
+ />
+ <label className="block mb-1 폰트-세미볼트">공급가액</label>
+ <입력
+ type="text"
+ 가치 = {공급량}
+          읽기 전용
+ className="w-전체 테두리 p-2 둥근 mb-2 bg-gray-100"
+ />
+ <label className="block mb-1 폰트-세미볼트">부가세</label>
+ <입력
+ type="text"
+ 값 = {vatOutput}
+          읽기 전용
+ className="w-전체 테두리 p-2 둥근 mb-2 bg-gray-100"
+ />
+ 버튼
+ onClick={(() => {
+ setVatInput(""");
+ setVatOutput(""");
+ 공급량 설정;
           }}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-        >부가세 초기화</button>
-      </div>
-    </div>
-  );
+ className="bg-blue-500 호버:bg-blue-600 텍스트-흰색 글꼴-볼드 py-2 px-4 반올림"
+ >부가세 초기화</button>
+ </div>
+ </div>
+ );
 }
