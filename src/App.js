@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
   const [manualTotal, setManualTotal] = useState("");
-  const [supplierCount, setSupplierCount] = useState(5);
+  const [supplierCount, setSupplierCount] = useState(2);
   const [manualInputs, setManualInputs] = useState({});
   const [vatInput, setVatInput] = useState("");
   const [vatOutput, setVatOutput] = useState("");
