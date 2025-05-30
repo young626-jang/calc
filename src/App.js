@@ -1,13 +1,18 @@
-
 import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
   const [manualTotal, setManualTotal] = useState("");
-  const [supplierCount, setSupplierCount] = useState(2);
+  const [supplierCount, setSupplierCount] = useState(5);
   const [manualInputs, setManualInputs] = useState({});
   const [vatInput, setVatInput] = useState("");
   const [vatOutput, setVatOutput] = useState("");
   const [supplyAmount, setSupplyAmount] = useState("");
+
+  const [loanAmount, setLoanAmount] = useState("");
+  const [annualRate, setAnnualRate] = useState("");
+  const [dailyInterest, setDailyInterest] = useState("");
+  const [monthlyInterest, setMonthlyInterest] = useState("");
+  const [yearlyInterest, setYearlyInterest] = useState("");
 
   const suppliers = Array.from({ length: supplierCount }, (_, i) => String.fromCharCode(65 + i));
   const inputRefs = useRef({});
@@ -16,7 +21,7 @@ export default function App() {
   const formatNumber = (value) => parseNumber(value).toLocaleString();
 
   const getFinalAmount = (key) => {
-    const base = parseNumber(manualTotal) ;
+    const base = parseNumber(manualTotal);
     const manualKeys = suppliers.filter(k => manualInputs[k] && manualInputs[k] !== "");
     const manualSum = manualKeys.reduce((sum, k) => sum + parseNumber(manualInputs[k]), 0);
     const remaining = base - manualSum;
@@ -59,6 +64,25 @@ export default function App() {
     setVatOutput(formatNumber(vat));
     setSupplyAmount(formatNumber(supply));
   }, [vatInput]);
+
+  useEffect(() => {
+    const principal = parseNumber(loanAmount);
+    const rate = parseFloat(annualRate) / 100;
+
+    if (!isNaN(principal) && !isNaN(rate)) {
+      const year = Math.floor(principal * rate);
+      const month = Math.floor(year / 12);
+      const day = Math.floor(year / 365);
+
+      setYearlyInterest(formatNumber(year));
+      setMonthlyInterest(formatNumber(month));
+      setDailyInterest(formatNumber(day));
+    } else {
+      setYearlyInterest("");
+      setMonthlyInterest("");
+      setDailyInterest("");
+    }
+  }, [loanAmount, annualRate]);
 
   const totalLoanNumber = parseNumber(manualTotal);
   const distributedAmount = getTotalDistributed();
@@ -192,6 +216,64 @@ export default function App() {
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
           부가세 초기화
+        </button>
+      </div>
+
+      {/* 이자 계산기 */}
+      <div className="mb-4 border-t pt-4">
+        <h2 className="text-xl font-bold mb-2">이자 계산기</h2>
+
+        <label className="block mb-1 font-semibold">대출금액</label>
+        <input
+          type="text"
+          value={formatNumber(loanAmount)}
+          onChange={(e) => setLoanAmount(e.target.value.replace(/[^0-9,]/g, ""))}
+          className="w-full border p-2 rounded mb-2"
+        />
+
+        <label className="block mb-1 font-semibold">연이율 (%)</label>
+        <input
+          type="text"
+          value={annualRate}
+          onChange={(e) => setAnnualRate(e.target.value.replace(/[^0-9.]/g, ""))}
+          className="w-full border p-2 rounded mb-2"
+        />
+
+        <label className="block mb-1 font-semibold">하루 이자</label>
+        <input
+          type="text"
+          value={dailyInterest}
+          readOnly
+          className="w-full border p-2 rounded mb-2 bg-gray-100"
+        />
+
+        <label className="block mb-1 font-semibold">한달 이자</label>
+        <input
+          type="text"
+          value={monthlyInterest}
+          readOnly
+          className="w-full border p-2 rounded mb-2 bg-gray-100"
+        />
+
+        <label className="block mb-1 font-semibold">1년 이자</label>
+        <input
+          type="text"
+          value={yearlyInterest}
+          readOnly
+          className="w-full border p-2 rounded mb-2 bg-gray-100"
+        />
+
+        <button
+          onClick={() => {
+            setLoanAmount("");
+            setAnnualRate("");
+            setDailyInterest("");
+            setMonthlyInterest("");
+            setYearlyInterest("");
+          }}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+        >
+          이자 초기화
         </button>
       </div>
     </div>
