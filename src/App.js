@@ -16,7 +16,7 @@ export default function App() {
   const formatNumber = (value) => parseNumber(value).toLocaleString();
 
   const getFinalAmount = (key) => {
-    const base = parseNumber(manualTotal) + 1000000;
+    const base = parseNumber(manualTotal) ;
     const manualKeys = suppliers.filter(k => manualInputs[k] && manualInputs[k] !== "");
     const manualSum = manualKeys.reduce((sum, k) => sum + parseNumber(manualInputs[k]), 0);
     const remaining = base - manualSum;
