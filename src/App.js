@@ -84,16 +84,28 @@ export default function App() {
     const principalInManwon = parseNumber(loanAmount);
     const principal = principalInManwon * 10000;
     
-    // parseFloat('')는 NaN을 반환하므로, || 0을 추가하여 안전하게 처리합니다.
     const rateValue = parseFloat(annualRate) || 0;
     const rate = rateValue / 100;
     
     const y = parseInt(years, 10) || 1;
 
+    // --- 디버깅을 위한 console.log 추가 ---
+    console.log("--- 이자 계산 시작 ---");
+    console.log("입력된 대출금액 (만원):", principalInManwon);
+    console.log("계산용 원금 (원):", principal);
+    console.log("적용 이율:", rate);
+    // --- 디버깅 끝 ---
+
     if (principal > 0 && rate > 0 && y > 0) {
       const year = Math.floor(principal * rate * y);
       const month = Math.floor(year / 12);
       const day = Math.floor(year / 365);
+      
+      // --- 디버깅을 위한 console.log 추가 ---
+      console.log("계산된 하루 이자:", day);
+      console.log("----------------------");
+      // --- 디버깅 끝 ---
+
       setYearlyInterest(year);
       setMonthlyInterest(month);
       setDailyInterest(day);
