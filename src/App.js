@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
-  const [useManwonUnit, setUseManwonUnit] = useState(false);
+  // (삭제) '만원 단위' 토글 관련 상태 및 함수 모두 삭제
 
   const [manualTotal, setManualTotal] = useState("");
   const [supplierCount, setSupplierCount] = useState(2);
@@ -26,15 +26,6 @@ export default function App() {
 
   const parseNumber = (value) => parseInt((value ?? '').toString().replace(/,/g, "")) || 0;
   const formatNumber = (value) => parseNumber(value).toLocaleString();
-
-  const displayInterestAmount = (amount) => {
-    const num = Number(amount) || 0;
-    if (useManwonUnit) {
-      const manwonValue = Math.round(num / 10000);
-      return `${manwonValue.toLocaleString()} 만 원`;
-    }
-    return `${num.toLocaleString()} 원`;
-  };
 
   const getFinalAmount = (key) => {
     const base = parseNumber(manualTotal);
@@ -82,11 +73,9 @@ export default function App() {
   }, [vatInput]);
 
   useEffect(() => {
-    // --- (수정) 토글 상태에 따라 실제 원금을 10000배로 계산 ---
-    let principal = parseNumber(loanAmount);
-    if (useManwonUnit) {
-      principal *= 10000;
-    }
+    // --- (수정) 입력된 만원 단위 금액을 원 단위로 변환하여 계산 ---
+    const principalInManwon = parseNumber(loanAmount);
+    const principal = principalInManwon * 10000; // 원 단위로 변환
     
     const rate = parseFloat(annualRate) / 100;
     const y = parseInt(years, 10) || 1;
@@ -103,7 +92,7 @@ export default function App() {
       setMonthlyInterest(0);
       setDailyInterest(0);
     }
-  }, [loanAmount, annualRate, years, useManwonUnit]); // useManwonUnit을 의존성 배열에 추가
+  }, [loanAmount, annualRate, years]);
 
   useEffect(() => {
     const rate = parseFloat(annualRate);
@@ -253,30 +242,16 @@ export default function App() {
       </div>
 
       <div className="mb-4 border-t pt-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">이자 계산기</h2>
-          <div className="flex items-center">
-            <label htmlFor="unit-toggle" className="mr-2 font-semibold text-gray-700">만원 단위로 보기</label>
-            <input
-              type="checkbox"
-              id="unit-toggle"
-              checked={useManwonUnit}
-              onChange={(e) => setUseManwonUnit(e.target.checked)}
-              className="h-5 w-5 rounded"
-            />
-          </div>
-        </div>
+        <h2 className="text-xl font-bold mb-4">이자 계산기</h2>
 
         {dailyRateDisplay && (
           <p className="text-blue-600 font-semibold text-center bg-blue-50 p-3 rounded-md mb-4">
             {dailyRateDisplay}
           </p>
         )}
-        
-        {/* --- (수정) 토글 상태에 따라 대출금액 라벨 변경 --- */}
-        <label className="block mb-1 font-semibold">
-          대출금액 ({useManwonUnit ? '만원' : '원'})
-        </label>
+
+        {/* --- (수정) 대출금액 라벨을 '(만원)'으로 변경 --- */}
+        <label className="block mb-1 font-semibold">대출금액 (만원)</label>
         <input
           type="text"
           value={formatNumber(loanAmount)}
@@ -299,11 +274,12 @@ export default function App() {
           onChange={(e) => setYears(e.target.value.replace(/[^0-9]/g, ""))}
           className="w-full border p-2 rounded mb-2"
         />
-
+        
+        {/* --- (수정) 이자 결과는 항상 '원' 단위로 표시 --- */}
         <label className="block mb-1 font-semibold">하루 이자</label>
         <input
           type="text"
-          value={displayInterestAmount(dailyInterest)}
+          value={`${dailyInterest.toLocaleString()} 원`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
@@ -311,7 +287,7 @@ export default function App() {
         <label className="block mb-1 font-semibold">한달 이자</label>
         <input
           type="text"
-          value={displayInterestAmount(monthlyInterest)}
+          value={`${monthlyInterest.toLocaleString()} 원`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
@@ -319,7 +295,7 @@ export default function App() {
         <label className="block mb-1 font-semibold">{years || 1}년 이자</label>
         <input
           type="text"
-          value={displayInterestAmount(yearlyInterest)}
+          value={`${yearlyInterest.toLocaleString()} 원`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
