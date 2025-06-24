@@ -27,7 +27,6 @@ export default function App() {
   const parseNumber = (value) => parseInt((value ?? '').toString().replace(/,/g, "")) || 0;
   const formatNumber = (value) => parseNumber(value).toLocaleString();
 
-  // '만 원' 단위 토글에 따라 이자 금액을 표시하는 함수
   const displayInterestAmount = (amount) => {
     const num = Number(amount) || 0;
     if (useManwonUnit) {
@@ -83,7 +82,12 @@ export default function App() {
   }, [vatInput]);
 
   useEffect(() => {
-    const principal = parseNumber(loanAmount);
+    // --- (수정) 토글 상태에 따라 실제 원금을 10000배로 계산 ---
+    let principal = parseNumber(loanAmount);
+    if (useManwonUnit) {
+      principal *= 10000;
+    }
+    
     const rate = parseFloat(annualRate) / 100;
     const y = parseInt(years, 10) || 1;
 
@@ -99,7 +103,7 @@ export default function App() {
       setMonthlyInterest(0);
       setDailyInterest(0);
     }
-  }, [loanAmount, annualRate, years]);
+  }, [loanAmount, annualRate, years, useManwonUnit]); // useManwonUnit을 의존성 배열에 추가
 
   useEffect(() => {
     const rate = parseFloat(annualRate);
@@ -193,14 +197,12 @@ export default function App() {
                     className="w-full border p-1 rounded"
                   />
                 </td>
-                {/* --- (수정) 공급자 분배금은 항상 '원' 단위로 표시 --- */}
                 <td className="border p-2">{getFinalAmount(key).toLocaleString()} 원</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* --- (수정) 총합/오차는 항상 '원' 단위로 표시 --- */}
         <div className="mb-2 text-sm text-gray-700 font-medium">
           총합: {distributedAmount.toLocaleString()} 원 / 오차: {difference.toLocaleString()} 원
         </div>
@@ -225,7 +227,6 @@ export default function App() {
           className="w-full border p-2 rounded mb-2"
         />
         <label className="block mb-1 font-semibold">공급가액</label>
-        {/* --- (수정) 부가세/공급가액은 항상 '원' 단위로 표시 --- */}
         <input
           type="text"
           value={`${supplyAmount.toLocaleString()} 원`}
@@ -254,7 +255,6 @@ export default function App() {
       <div className="mb-4 border-t pt-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">이자 계산기</h2>
-          {/* --- (수정) 토글 스위치를 이자 계산기 섹션으로 이동 --- */}
           <div className="flex items-center">
             <label htmlFor="unit-toggle" className="mr-2 font-semibold text-gray-700">만원 단위로 보기</label>
             <input
@@ -272,8 +272,11 @@ export default function App() {
             {dailyRateDisplay}
           </p>
         )}
-
-        <label className="block mb-1 font-semibold">대출금액 (원)</label>
+        
+        {/* --- (수정) 토글 상태에 따라 대출금액 라벨 변경 --- */}
+        <label className="block mb-1 font-semibold">
+          대출금액 ({useManwonUnit ? '만원' : '원'})
+        </label>
         <input
           type="text"
           value={formatNumber(loanAmount)}
@@ -297,7 +300,6 @@ export default function App() {
           className="w-full border p-2 rounded mb-2"
         />
 
-        {/* --- (수정 없음) 이자 계산기 결과는 토글에 따라 변경됨 --- */}
         <label className="block mb-1 font-semibold">하루 이자</label>
         <input
           type="text"
