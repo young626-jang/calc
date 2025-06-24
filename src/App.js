@@ -14,6 +14,9 @@ export default function App() {
   const [dailyInterest, setDailyInterest] = useState("");
   const [monthlyInterest, setMonthlyInterest] = useState("");
   const [yearlyInterest, setYearlyInterest] = useState("");
+  
+  // --- 1. 새로운 상태 변수 추가 ---
+  const [dailyRateDisplay, setDailyRateDisplay] = useState("");
 
   const suppliers = Array.from({ length: supplierCount }, (_, i) => String.fromCharCode(65 + i));
   const inputRefs = useRef({});
@@ -71,7 +74,7 @@ export default function App() {
     const rate = parseFloat(annualRate) / 100;
     const y = parseInt(years, 10) || 1;
 
-    if (!isNaN(principal) && !isNaN(rate) && y > 0) {
+    if (principal > 0 && rate > 0 && y > 0) {
       const year = Math.floor(principal * rate * y);
       const month = Math.floor(year / 12 / y);
       const day = Math.floor(year / 365 / y);
@@ -85,6 +88,18 @@ export default function App() {
       setDailyInterest("");
     }
   }, [loanAmount, annualRate, years]);
+
+  // --- 2. 하루 이자율 계산을 위한 새로운 useEffect 로직 추가 ---
+  useEffect(() => {
+    const rate = parseFloat(annualRate);
+    if (!isNaN(rate) && rate > 0) {
+      const dailyRate = (rate / 365).toFixed(4);
+      setDailyRateDisplay(`연이율 ${rate}% 는 하루 이자율 ${dailyRate}% 입니다.`);
+    } else {
+      setDailyRateDisplay("");
+    }
+  }, [annualRate]);
+
 
   const totalLoanNumber = parseNumber(manualTotal);
   const distributedAmount = getTotalDistributed();
@@ -223,6 +238,13 @@ export default function App() {
 
       <div className="mb-4 border-t pt-4">
         <h2 className="text-xl font-bold mb-2">이자 계산기</h2>
+
+        {/* --- 3. 계산된 하루 이자율을 보여주는 UI 추가 --- */}
+        {dailyRateDisplay && (
+          <p className="text-blue-600 font-semibold text-center bg-blue-50 p-3 rounded-md mb-4">
+            {dailyRateDisplay}
+          </p>
+        )}
 
         <label className="block mb-1 font-semibold">대출금액</label>
         <input
