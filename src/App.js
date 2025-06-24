@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
-  // (삭제) '만원 단위' 토글 관련 상태 및 함수 모두 삭제
-
   const [manualTotal, setManualTotal] = useState("");
   const [supplierCount, setSupplierCount] = useState(2);
   const [manualInputs, setManualInputs] = useState({});
@@ -25,7 +23,12 @@ export default function App() {
   const inputRefs = useRef({});
 
   const parseNumber = (value) => parseInt((value ?? '').toString().replace(/,/g, "")) || 0;
-  const formatNumber = (value) => parseNumber(value).toLocaleString();
+  const formatNumber = (value) => {
+      // 빈 문자열이거나 0이면 빈 문자열 반환 (입력 필드를 깔끔하게 비우기 위함)
+      const num = parseNumber(value);
+      if (num === 0 && (value === "" || value === 0)) return "";
+      return num.toLocaleString();
+  };
 
   const getFinalAmount = (key) => {
     const base = parseNumber(manualTotal);
@@ -66,24 +69,31 @@ export default function App() {
 
   useEffect(() => {
     const value = parseNumber(vatInput);
-    const vat = Math.floor(value / 11);
-    const supply = value - vat;
-    setVatOutput(vat);
-    setSupplyAmount(supply);
+    if (value > 0) {
+        const vat = Math.floor(value / 11);
+        const supply = value - vat;
+        setVatOutput(vat);
+        setSupplyAmount(supply);
+    } else {
+        setVatOutput(0);
+        setSupplyAmount(0);
+    }
   }, [vatInput]);
 
   useEffect(() => {
-    // --- (수정) 입력된 만원 단위 금액을 원 단위로 변환하여 계산 ---
     const principalInManwon = parseNumber(loanAmount);
-    const principal = principalInManwon * 10000; // 원 단위로 변환
+    const principal = principalInManwon * 10000;
     
-    const rate = parseFloat(annualRate) / 100;
+    // parseFloat('')는 NaN을 반환하므로, || 0을 추가하여 안전하게 처리합니다.
+    const rateValue = parseFloat(annualRate) || 0;
+    const rate = rateValue / 100;
+    
     const y = parseInt(years, 10) || 1;
 
     if (principal > 0 && rate > 0 && y > 0) {
       const year = Math.floor(principal * rate * y);
-      const month = Math.floor(year / 12 / y);
-      const day = Math.floor(year / 365 / y);
+      const month = Math.floor(year / 12);
+      const day = Math.floor(year / 365);
       setYearlyInterest(year);
       setMonthlyInterest(month);
       setDailyInterest(day);
@@ -95,10 +105,10 @@ export default function App() {
   }, [loanAmount, annualRate, years]);
 
   useEffect(() => {
-    const rate = parseFloat(annualRate);
-    if (!isNaN(rate) && rate > 0) {
-      const dailyRate = (rate / 365).toFixed(4);
-      setDailyRateDisplay(`연이율 ${rate}% 는 하루 이자율 ${dailyRate}% 입니다.`);
+    const rateValue = parseFloat(annualRate) || 0;
+    if (rateValue > 0) {
+      const dailyRate = (rateValue / 365).toFixed(4);
+      setDailyRateDisplay(`연이율 ${rateValue}% 는 하루 이자율 ${dailyRate}% 입니다.`);
     } else {
       setDailyRateDisplay("");
     }
@@ -250,7 +260,6 @@ export default function App() {
           </p>
         )}
 
-        {/* --- (수정) 대출금액 라벨을 '(만원)'으로 변경 --- */}
         <label className="block mb-1 font-semibold">대출금액 (만원)</label>
         <input
           type="text"
@@ -275,7 +284,6 @@ export default function App() {
           className="w-full border p-2 rounded mb-2"
         />
         
-        {/* --- (수정) 이자 결과는 항상 '원' 단위로 표시 --- */}
         <label className="block mb-1 font-semibold">하루 이자</label>
         <input
           type="text"
