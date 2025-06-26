@@ -177,7 +177,7 @@ export default function App() {
           <thead>
             <tr>
               <th className="border p-2">공급자</th>
-              <th className="border p-2">수기 입력 금액 (원)</th>
+              <th className="border p-2">수기 입력 금액</th>
               <th className="border p-2">자동 계산 금액</th>
             </tr>
           </thead>
@@ -208,7 +208,7 @@ export default function App() {
                     className="w-full border p-1 rounded"
                   />
                 </td>
-                <td className="border p-2">{getFinalAmount(key).toLocaleString()} 원</td>
+                <td className="border p-2">{getFinalAmount(key).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -230,7 +230,7 @@ export default function App() {
 
       <div className="border-t pt-4 mb-4">
         <h2 className="text-xl font-bold mb-2">부가세 계산기</h2>
-        <label className="block mb-1 font-semibold">부가세 포함 금액 입력 (원)</label>
+        <label className="block mb-1 font-semibold">부가세 포함 금액 입력 </label>
         <input
           type="text"
           value={formatNumber(vatInput)}
@@ -299,7 +299,7 @@ export default function App() {
         <label className="block mb-1 font-semibold">하루 이자</label>
         <input
           type="text"
-          value={`${dailyInterest.toLocaleString()} 원`}
+          value={`${dailyInterest.toLocaleString()}원`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
@@ -307,7 +307,7 @@ export default function App() {
         <label className="block mb-1 font-semibold">한달 이자</label>
         <input
           type="text"
-          value={`${monthlyInterest.toLocaleString()} 원`}
+          value={`${monthlyInterest.toLocaleString()}원`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
@@ -315,7 +315,7 @@ export default function App() {
         <label className="block mb-1 font-semibold">{years || 1}년 이자</label>
         <input
           type="text"
-          value={`${yearlyInterest.toLocaleString()} 원`}
+          value={`${yearlyInterest.toLocaleString()}원`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
