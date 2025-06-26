@@ -208,7 +208,7 @@ export default function App() {
                     className="w-full border p-1 rounded"
                   />
                 </td>
-                <td className="border p-2">{getFinalAmount(key).toLocaleString()}</td>
+                <td className="border p-2">{getFinalAmount(key).toLocaleString()}원</td>
               </tr>
             ))}
           </tbody>
@@ -240,14 +240,14 @@ export default function App() {
         <label className="block mb-1 font-semibold">공급가액</label>
         <input
           type="text"
-          value={`${supplyAmount.toLocaleString()} `}
+          value={`${supplyAmount.toLocaleString()}원 `}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
         <label className="block mb-1 font-semibold">부가세</label>
         <input
           type="text"
-          value={`${vatOutput.toLocaleString()} `}
+          value={`${vatOutput.toLocaleString()}원 `}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
