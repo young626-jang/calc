@@ -240,14 +240,14 @@ export default function App() {
         <label className="block mb-1 font-semibold">공급가액</label>
         <input
           type="text"
-          value={`${supplyAmount.toLocaleString()}원 `}
+          value={`${supplyAmount.toLocaleString()}`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
         <label className="block mb-1 font-semibold">부가세</label>
         <input
           type="text"
-          value={`${vatOutput.toLocaleString()}원 `}
+          value={`${vatOutput.toLocaleString()}`}
           readOnly
           className="w-full border p-2 rounded mb-2 bg-gray-100"
         />
