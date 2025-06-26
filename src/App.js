@@ -92,7 +92,7 @@ export default function App() {
     // --- 디버깅을 위한 console.log 추가 ---
     console.log("--- 이자 계산 시작 ---");
     console.log("입력된 대출금액 (만원):", principalInManwon);
-    console.log("계산용 원금 (원):", principal);
+    console.log("계산용 원금(원):", principal);
     console.log("적용 이율:", rate);
     // --- 디버깅 끝 ---
 
