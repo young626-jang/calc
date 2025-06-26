@@ -177,7 +177,7 @@ export default function App() {
           <thead>
             <tr>
               <th className="border p-2">공급자</th>
-              <th className="border p-2">수기 입력 금액</th>
+              <th className="border p-2">수기 입력 금액 원</th>
               <th className="border p-2">자동 계산 금액 원</th>
             </tr>
           </thead>
