@@ -215,7 +215,7 @@ export default function App() {
         </table>
 
         <div className="mb-2 text-sm text-gray-700 font-medium">
-          총합: {distributedAmount.toLocaleString()} 원 / 오차: {difference.toLocaleString()} 원
+          총합: {distributedAmount.toLocaleString()}원 / 오차: {difference.toLocaleString()}원
         </div>
 
         <div className="mb-6">
