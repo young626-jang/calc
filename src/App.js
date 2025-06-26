@@ -137,7 +137,7 @@ export default function App() {
       <div className="border-t pt-4 mb-4">
         <h2 className="text-xl font-bold mb-2">공급자 분배금 계산기</h2>
         <div className="mb-4">
-          <label className="block mb-1 font-semibold">총 분배 금액 (원)</label>
+          <label className="block mb-1 font-semibold">총 분배 금액</label>
           <input
             type="text"
             value={formatNumber(manualTotal)}
@@ -178,7 +178,7 @@ export default function App() {
             <tr>
               <th className="border p-2">공급자</th>
               <th className="border p-2">수기 입력 금액</th>
-              <th className="border p-2">자동 계산 금액</th>
+              <th className="border p-2">자동 계산 금액 원</th>
             </tr>
           </thead>
           <tbody>
