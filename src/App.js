@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
+  // 새로운 공급자 합산기 상태
+  const [suppliers, setSuppliers] = useState([{ name: "", amounts: [""] }]);
+
   const [manualTotal, setManualTotal] = useState("");
   const [supplierCount, setSupplierCount] = useState(2);
   const [manualInputs, setManualInputs] = useState({});
   const [vatInput, setVatInput] = useState("");
-  
+
   const [vatOutput, setVatOutput] = useState(0);
   const [supplyAmount, setSupplyAmount] = useState(0);
-  
+
   const [loanAmount, setLoanAmount] = useState("");
   const [annualRate, setAnnualRate] = useState("");
   const [years, setYears] = useState("1");
@@ -19,20 +22,47 @@ export default function App() {
 
   const [dailyRateDisplay, setDailyRateDisplay] = useState("");
 
-  const suppliers = Array.from({ length: supplierCount }, (_, i) => String.fromCharCode(65 + i));
+  const distSuppliers = Array.from({ length: supplierCount }, (_, i) => String.fromCharCode(65 + i));
   const inputRefs = useRef({});
 
   const parseNumber = (value) => parseInt((value ?? '').toString().replace(/,/g, "")) || 0;
   const formatNumber = (value) => {
-      // 빈 문자열이거나 0이면 빈 문자열 반환 (입력 필드를 깔끔하게 비우기 위함)
-      const num = parseNumber(value);
-      if (num === 0 && (value === "" || value === 0)) return "";
-      return num.toLocaleString();
+    const num = parseNumber(value);
+    if (num === 0 && (value === "" || value === 0)) return "";
+    return num.toLocaleString();
   };
+
+  // 공급자 합산기 관련 함수
+  const addSupplier = () => {
+    setSuppliers([...suppliers, { name: "", amounts: [""] }]);
+  };
+
+  const handleSupplierNameChange = (index, name) => {
+    const newSuppliers = [...suppliers];
+    newSuppliers[index].name = name;
+    setSuppliers(newSuppliers);
+  };
+
+  const handleAmountChange = (supplierIndex, amountIndex, amount) => {
+    const newSuppliers = [...suppliers];
+    newSuppliers[supplierIndex].amounts[amountIndex] = amount.replace(/[^0-9,]/g, "");
+    setSuppliers(newSuppliers);
+  };
+
+  const addAmountField = (supplierIndex) => {
+    const newSuppliers = [...suppliers];
+    newSuppliers[supplierIndex].amounts.push("");
+    setSuppliers(newSuppliers);
+  };
+
+  const getSupplierTotal = (amounts) => {
+    return amounts.reduce((sum, amount) => sum + parseNumber(amount), 0);
+  };
+
 
   const getFinalAmount = (key) => {
     const base = parseNumber(manualTotal);
-    const manualKeys = suppliers.filter(k => manualInputs[k] && manualInputs[k] !== "");
+    const manualKeys = distSuppliers.filter(k => manualInputs[k] && manualInputs[k] !== "");
     const manualSum = manualKeys.reduce((sum, k) => sum + parseNumber(manualInputs[k]), 0);
     const remaining = base - manualSum;
     const autoCount = supplierCount - manualKeys.length;
@@ -47,12 +77,12 @@ export default function App() {
   };
 
   const getTotalDistributed = () => {
-    return suppliers.reduce((sum, key) => sum + getFinalAmount(key), 0);
+    return distSuppliers.reduce((sum, key) => sum + getFinalAmount(key), 0);
   };
 
   const resetManualInputs = () => {
     const resetInputs = {};
-    suppliers.forEach((key) => {
+    distSuppliers.forEach((key) => {
       resetInputs[key] = "";
     });
     setManualInputs(resetInputs);
@@ -61,7 +91,7 @@ export default function App() {
 
   useEffect(() => {
     const updatedInputs = {};
-    suppliers.forEach((key) => {
+    distSuppliers.forEach((key) => {
       updatedInputs[key] = manualInputs[key] || "";
     });
     setManualInputs(updatedInputs);
@@ -89,23 +119,11 @@ export default function App() {
     
     const y = parseInt(years, 10) || 1;
 
-    // --- 디버깅을 위한 console.log 추가 ---
-    console.log("--- 이자 계산 시작 ---");
-    console.log("입력된 대출금액 (만원):", principalInManwon);
-    console.log("계산용 원금(원):", principal);
-    console.log("적용 이율:", rate);
-    // --- 디버깅 끝 ---
-
     if (principal > 0 && rate > 0 && y > 0) {
       const year = Math.floor(principal * rate * y);
       const month = Math.floor(year / 12);
       const day = Math.floor(year / 365);
       
-      // --- 디버깅을 위한 console.log 추가 ---
-      console.log("계산된 하루 이자:", day);
-      console.log("----------------------");
-      // --- 디버깅 끝 ---
-
       setYearlyInterest(year);
       setMonthlyInterest(month);
       setDailyInterest(day);
@@ -133,6 +151,53 @@ export default function App() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">다기능 계산기</h1>
+
+      {/* 공급자별 자동금액 합산기 */}
+      <div className="border-t pt-4 mb-4">
+        <h2 className="text-xl font-bold mb-2">공급자별 자동금액 합산기</h2>
+        <button
+          onClick={addSupplier}
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          공급자 추가 +
+        </button>
+        {suppliers.map((supplier, supplierIndex) => (
+          <div key={supplierIndex} className="mb-4 p-4 border rounded">
+            <div className="mb-2">
+              <label className="block mb-1 font-semibold">공급자명</label>
+              <input
+                type="text"
+                value={supplier.name}
+                onChange={(e) => handleSupplierNameChange(supplierIndex, e.target.value)}
+                className="w-full border p-2 rounded"
+                placeholder="공급자명을 입력하세요"
+              />
+            </div>
+            {supplier.amounts.map((amount, amountIndex) => (
+              <div key={amountIndex} className="mb-2">
+                <label className="block mb-1 font-semibold">금액</label>
+                <input
+                  type="text"
+                  value={formatNumber(amount)}
+                  onChange={(e) => handleAmountChange(supplierIndex, amountIndex, e.target.value)}
+                  className="w-full border p-2 rounded"
+                  placeholder="금액을 입력하세요"
+                />
+              </div>
+            ))}
+            <button
+              onClick={() => addAmountField(supplierIndex)}
+              className="mt-2 px-3 py-1 bg-gray-200 rounded text-sm"
+            >
+              금액 필드 추가
+            </button>
+            <div className="mt-2 font-bold text-lg">
+              {supplier.name || "공급자"} 합계: {getSupplierTotal(supplier.amounts).toLocaleString()} 원
+            </div>
+          </div>
+        ))}
+      </div>
+
 
       <div className="border-t pt-4 mb-4">
         <h2 className="text-xl font-bold mb-2">공급자 분배금 계산기</h2>
@@ -182,7 +247,7 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
-            {suppliers.map((key, index) => (
+            {distSuppliers.map((key, index) => (
               <tr key={key}>
                 <td className="border p-2">공급자 {key}</td>
                 <td className="border p-2">
@@ -199,7 +264,7 @@ export default function App() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        const nextKey = suppliers[index + 1];
+                        const nextKey = distSuppliers[index + 1];
                         if (nextKey && inputRefs.current[nextKey]) {
                           inputRefs.current[nextKey].focus();
                         }
